@@ -8,6 +8,6 @@ export class AuthController {
 
   @Post('signup')
   signUp(@Body(ValidationPipe) signUpDto: SignUpDto) {
-    return this.authService.signUp(signUpDto);
+    // return this.authService.signUp(signUpDto);
   }
 }
