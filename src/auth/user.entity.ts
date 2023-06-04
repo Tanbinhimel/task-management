@@ -26,16 +26,25 @@ export class User extends BaseEntity {
   @Column()
   password: string;
 
+  @Column()
+  salt: string;
+
   constructor(
     firstName: string,
     lastName: string,
     email: string,
     password: string,
+    salt: string,
   ) {
     super();
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
     this.password = password;
+    this.salt = salt;
+  }
+
+  validatePassword(password: string): boolean {
+    return false;
   }
 }

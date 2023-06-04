@@ -5,6 +5,8 @@ import { SignUpDto } from './dto/sign-up.dto';
 import { ConflictException, NotAcceptableException } from '@nestjs/common';
 import { HttpResponse } from '../common/http-response/http-response.common';
 import { ErrorCode } from '../common/error-code/error-code.common';
+import * as bcrypt from 'bcrypt';
+import { SignInDto } from './dto/sign-in.dto';
 
 export class UserRepository {
   constructor(
@@ -13,7 +15,9 @@ export class UserRepository {
 
   async signUp(signUpDto: SignUpDto) {
     const { email, password, firstName, lastName } = signUpDto;
-    const newUser = new User(firstName, lastName, email, password);
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await this.getHashedPassword(password, salt);
+    const newUser = new User(firstName, lastName, email, hashedPassword, salt);
 
     try {
       await newUser.save();
@@ -28,5 +32,16 @@ export class UserRepository {
           throw new NotAcceptableException('Unable to sign up at this moment');
       }
     }
+  }
+
+  private async getHashedPassword(
+    password: string,
+    salt: string,
+  ): Promise<string> {
+    return await bcrypt.hash(password, salt);
+  }
+
+  async signIn(signInDto: SignInDto) {
+    return null;
   }
 }
