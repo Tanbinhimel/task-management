@@ -1,3 +1,3 @@
 export enum ErrorCode {
-  'DUPLICATE_KEY_ERROR' = '23505',
+  'CONFLICT_ERROR' = '23505',
 }

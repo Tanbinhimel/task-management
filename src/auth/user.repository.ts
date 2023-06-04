@@ -2,7 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { SignUpDto } from './dto/sign-up.dto';
-import { BadRequestException, NotAcceptableException } from '@nestjs/common';
+import { ConflictException, NotAcceptableException } from '@nestjs/common';
 import { HttpResponse } from '../common/http-response/http-response.common';
 import { ErrorCode } from '../common/error-code/error-code.common';
 
@@ -20,8 +20,8 @@ export class UserRepository {
       return new HttpResponse(200, 'User created successfully').result;
     } catch (error) {
       switch (error.code) {
-        case ErrorCode.DUPLICATE_KEY_ERROR:
-          throw new BadRequestException(
+        case ErrorCode.CONFLICT_ERROR:
+          throw new ConflictException(
             `A user with this email ${email} already exists`,
           );
         default:
