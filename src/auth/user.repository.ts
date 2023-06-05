@@ -5,8 +5,8 @@ import { SignUpDto } from './dto/sign-up.dto';
 import {
   ConflictException,
   NotAcceptableException,
-  NotFoundException,
-} from '@nestjs/common';
+  NotFoundException, UnauthorizedException
+} from "@nestjs/common";
 import { HttpResponse } from '../common/http-response/http-response.common';
 import { ErrorCode } from '../common/error-code/error-code.common';
 import * as bcrypt from 'bcrypt';
@@ -43,7 +43,7 @@ export class UserRepository {
     const user = await this.userRepository.findOneBy({ email });
 
     if (!user) {
-      throw new NotFoundException(`Invalid credentials`);
+      throw new UnauthorizedException(`Invalid credentials`);
     }
 
     console.log(await user.isPasswordValid(password));
