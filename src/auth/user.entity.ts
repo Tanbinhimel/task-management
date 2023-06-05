@@ -6,6 +6,7 @@ import {
   Unique,
 } from 'typeorm';
 import { IsEmail } from 'class-validator';
+import * as bcrypt from 'bcrypt';
 
 @Entity()
 @Unique(['email'])
@@ -44,7 +45,7 @@ export class User extends BaseEntity {
     this.salt = salt;
   }
 
-  validatePassword(password: string): boolean {
-    return false;
+  async isPasswordValid(password: string): Promise<boolean> {
+    return (await bcrypt.hash(password, this.salt)) === this.password;
   }
 }

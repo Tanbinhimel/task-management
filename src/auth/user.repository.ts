@@ -2,7 +2,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { SignUpDto } from './dto/sign-up.dto';
-import { ConflictException, NotAcceptableException } from '@nestjs/common';
+import {
+  ConflictException,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { HttpResponse } from '../common/http-response/http-response.common';
 import { ErrorCode } from '../common/error-code/error-code.common';
 import * as bcrypt from 'bcrypt';
@@ -16,7 +20,7 @@ export class UserRepository {
   async signUp(signUpDto: SignUpDto) {
     const { email, password, firstName, lastName } = signUpDto;
     const salt = await bcrypt.genSalt();
-    const hashedPassword = await this.getHashedPassword(password, salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
     const newUser = new User(firstName, lastName, email, hashedPassword, salt);
 
     try {
@@ -26,7 +30,7 @@ export class UserRepository {
       switch (error.code) {
         case ErrorCode.CONFLICT_ERROR:
           throw new ConflictException(
-            `A user with this email ${email} already exists`,
+            `A user with this email "${email}" already exists`,
           );
         default:
           throw new NotAcceptableException('Unable to sign up at this moment');
@@ -34,14 +38,15 @@ export class UserRepository {
     }
   }
 
-  private async getHashedPassword(
-    password: string,
-    salt: string,
-  ): Promise<string> {
-    return await bcrypt.hash(password, salt);
-  }
-
   async signIn(signInDto: SignInDto) {
-    return null;
+    const { email, password } = signInDto;
+    const user = await this.userRepository.findOneBy({ email });
+
+    if (!user) {
+      throw new NotFoundException(`Invalid credentials`);
+    }
+
+    console.log(await user.isPasswordValid(password));
+    return await user.isPasswordValid(password);
   }
 }
