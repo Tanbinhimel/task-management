@@ -5,8 +5,8 @@ import { SignUpDto } from './dto/sign-up.dto';
 import {
   ConflictException,
   NotAcceptableException,
-  NotFoundException, UnauthorizedException
-} from "@nestjs/common";
+  UnauthorizedException,
+} from '@nestjs/common';
 import { HttpResponse } from '../common/http-response/http-response.common';
 import { ErrorCode } from '../common/error-code/error-code.common';
 import * as bcrypt from 'bcrypt';
