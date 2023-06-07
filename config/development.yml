@@ -1,0 +1,8 @@
+db:
+  host: 'dpg-churual269vccp11b3ig-a.oregon-postgres.render.com'
+  username: 'tanbin'
+  password: 'zsv62PnrLU3tO9pmTmzsEPEutF8MLQa2'
+  synchronize: true
+
+jwt:
+  secret: 'ruhimel30151'
