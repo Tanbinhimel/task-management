@@ -5,6 +5,7 @@ import { SignInDto } from './dto/sign-in.dto';
 import { JwtService } from '@nestjs/jwt';
 import { HttpResponse } from '../common/http-response/http-response.common';
 import { HttpResponseCode } from '../common/http-response/http-response-code.common';
+import { JwtPayload } from "./jwt-payload.interface";
 
 @Injectable()
 export class AuthService {
@@ -21,7 +22,7 @@ export class AuthService {
     const user = await this.userRepository.signIn(signInDto);
     const { id, email, firstName, lastName } = user;
 
-    const payload: object = { id, email, firstName, lastName };
+    const payload: JwtPayload = { id, email, firstName, lastName };
     const accessToken = this.jwtService.sign(payload);
 
     return new HttpResponse(
