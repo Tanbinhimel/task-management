@@ -5,7 +5,7 @@ import { SignInDto } from './dto/sign-in.dto';
 import { JwtService } from '@nestjs/jwt';
 import { HttpResponse } from '../common/http-response/http-response.common';
 import { HttpResponseCode } from '../common/http-response/http-response-code.common';
-import { JwtPayload } from "./jwt-payload.interface";
+import { JwtPayload } from './jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
