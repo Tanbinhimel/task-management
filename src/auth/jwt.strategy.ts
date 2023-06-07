@@ -4,9 +4,12 @@ import { JwtPayload } from './jwt-payload.interface';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { UnauthorizedException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private userRepository: Repository<User>) {
+  constructor(
+    @InjectRepository(User) private userRepository: Repository<User>,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: 'ruhimel30151',
@@ -14,11 +17,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload) {
+    console.log('test', payload);
     const { id } = payload;
     const user = await this.userRepository.findOneBy({ id });
-
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Invalid credentials');
     }
     return user;
   }
