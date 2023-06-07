@@ -20,12 +20,10 @@ export class AuthService {
   async signIn(signInDto: SignInDto) {
     const user = await this.userRepository.signIn(signInDto);
     const { id, email, firstName, lastName } = user;
-    const accessToken = this.jwtService.sign({
-      id,
-      email,
-      firstName,
-      lastName,
-    });
+
+    const payload: object = { id, email, firstName, lastName };
+    const accessToken = this.jwtService.sign(payload);
+
     return new HttpResponse(
       HttpResponseCode.SUCCESS,
       'user sign in successful',
