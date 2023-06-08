@@ -10,4 +10,7 @@ export class CreateTaskDto {
   @IsNotEmpty()
   @IsIn(allowedTaskStatusArray)
   status: TaskStatus;
+
+  @IsNotEmpty()
+  userId: number;
 }

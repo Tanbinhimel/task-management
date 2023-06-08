@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
@@ -26,8 +27,10 @@ export class TaskController {
   @UseGuards(AuthGuard())
   getTaskList(
     @Query(ValidationPipe) filterTaskDto: FilterTaskDto,
+    @Req() req,
   ): Promise<Task[]> {
-    return this.taskService.getTaskList(filterTaskDto);
+    console.log('req', req.user);
+    return this.taskService.getTaskList(req.user.id, filterTaskDto);
   }
 
   @Get('/:id')

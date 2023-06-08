@@ -4,22 +4,29 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
-import { DeleteResult, Repository } from 'typeorm';
+import { DataSource, DeleteResult, Repository } from 'typeorm';
 import { Task } from './task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FilterTaskDto } from './dto/filter-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { User } from '../auth/user.entity';
 
 @Injectable()
 export class TaskService {
   constructor(
     @InjectRepository(Task)
     private taskRepository: Repository<Task>,
+    private dataSource: DataSource,
   ) {}
 
-  async getTaskList(filterTaskDto: FilterTaskDto): Promise<Task[]> {
+  async getTaskList(
+    userId: number,
+    filterTaskDto: FilterTaskDto,
+  ): Promise<Task[]> {
     const query = this.taskRepository.createQueryBuilder('task');
     const { status, search } = filterTaskDto;
+
+    query.andWhere('task.userId = :userId', { userId });
 
     if (status) {
       query.andWhere('task.status = :status', { status });
@@ -42,19 +49,39 @@ export class TaskService {
   }
 
   async getTaskById(id: number): Promise<Task> {
-    const task: Task = await this.taskRepository.findOneBy({ id });
+    const query = this.dataSource
+      .getRepository(Task)
+      .createQueryBuilder('task');
+    const task = await query
+      .andWhere('task.id = :id', { id })
+      .leftJoinAndSelect('task.user', 'user')
+      .getOne();
+
     if (!task) {
       throw new NotFoundException(`Task with Id ${id} not found`);
+    }
+
+    if (task.user) {
+      delete task.user.password;
+      delete task.user.salt;
     }
     return task;
   }
 
   async createNewTask(createTaskDto: CreateTaskDto): Promise<Task> {
-    const { title, description, status } = createTaskDto;
+    const { title, description, status, userId } = createTaskDto;
+    const userRepo = this.dataSource.getRepository(User);
+    const user = await userRepo.findOneBy({ id: userId });
+
+    if (!user) {
+      throw new NotFoundException('Invalid user id');
+    }
+
     const newTask = new Task();
     newTask.title = title;
     newTask.description = description;
     newTask.status = status;
+    newTask.user = user;
 
     const newlyCreatedTask = await this.taskRepository.save(newTask);
 

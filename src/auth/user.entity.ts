@@ -1,12 +1,16 @@
 import {
   BaseEntity,
   Column,
+  CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
+  UpdateDateColumn,
 } from 'typeorm';
 import { IsEmail } from 'class-validator';
 import * as bcrypt from 'bcrypt';
+import { Task } from '../task/task.entity';
 
 @Entity()
 @Unique(['email'])
@@ -30,6 +34,14 @@ export class User extends BaseEntity {
   @Column()
   salt: string;
 
+  @OneToMany(() => Task, (task) => task.user)
+  taskList: Task[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
   constructor(
     firstName: string,
     lastName: string,
